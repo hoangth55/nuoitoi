@@ -1,0 +1,496 @@
+import React, { useState, useEffect } from 'react';
+import styled from 'styled-components';
+
+// Styled Components
+const AppContainer = styled.div`
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+`;
+
+const Header = styled.header`
+  background: rgba(255, 255, 255, 0.95);
+  padding: 1.5rem 2rem;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+`;
+
+const Logo = styled.div`
+  font-size: 1.8rem;
+  font-weight: bold;
+  text-align: center;
+  color: #4a5568;
+`;
+
+const MainContent = styled.main`
+  flex: 1;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+  width: 100%;
+
+  @media (max-width: 768px) {
+    padding: 1rem;
+  }
+`;
+
+const Section = styled.section`
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 20px;
+  padding: 2.5rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+
+  @media (max-width: 768px) {
+    padding: 1.5rem;
+  }
+`;
+
+const Hero = styled(Section)`
+  text-align: center;
+  padding: 3rem 1rem;
+`;
+
+const HeroTitle = styled.h1`
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  color: #2d3748;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+
+  @media (max-width: 768px) {
+    font-size: 2rem;
+  }
+`;
+
+const Tagline = styled.p`
+  font-size: 1.5rem;
+  color: #4a5568;
+  line-height: 1.6;
+
+  @media (max-width: 768px) {
+    font-size: 1.2rem;
+  }
+`;
+
+const SectionTitle = styled.h2`
+  text-align: center;
+  font-size: 2.2rem;
+  margin-bottom: 2rem;
+  color: #2d3748;
+
+  @media (max-width: 768px) {
+    font-size: 1.6rem;
+  }
+`;
+
+const FeaturesGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin-top: 2rem;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+`;
+
+const FeatureCard = styled.div`
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  padding: 2rem;
+  border-radius: 15px;
+  text-align: center;
+  color: white;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+  }
+`;
+
+const FeatureIcon = styled.div`
+  font-size: 3rem;
+  margin-bottom: 1rem;
+`;
+
+const FeatureTitle = styled.h3`
+  font-size: 1.3rem;
+  margin-bottom: 0.8rem;
+`;
+
+const FeatureDescription = styled.p`
+  font-size: 0.95rem;
+  line-height: 1.5;
+`;
+
+const CommitmentsList = styled.ul`
+  list-style: none;
+  max-width: 800px;
+  margin: 0 auto;
+`;
+
+const CommitmentItem = styled.li`
+  padding: 1rem;
+  margin-bottom: 1rem;
+  background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+  border-radius: 10px;
+  border-left: 4px solid #667eea;
+  font-size: 1.05rem;
+  line-height: 1.6;
+
+  strong {
+    color: #2d3748;
+  }
+`;
+
+const ComparisonGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+`;
+
+const ComparisonCard = styled.div`
+  padding: 2rem;
+  border-radius: 15px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  background: ${props => 
+    props.variant === 'negative' 
+      ? 'linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)'
+      : 'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)'
+  };
+
+  h3 {
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+    color: #2d3748;
+  }
+
+  ul {
+    list-style: none;
+  }
+
+  li {
+    padding: 0.8rem 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    font-size: 1.05rem;
+    line-height: 1.6;
+
+    &:last-child {
+      border-bottom: none;
+    }
+  }
+`;
+
+const DonateSection = styled(Section)`
+  text-align: center;
+`;
+
+const DonateTitle = styled.h2`
+  font-size: 2rem;
+  margin-bottom: 2rem;
+  color: #2d3748;
+`;
+
+const QRPlaceholder = styled.div`
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 3rem;
+  border-radius: 15px;
+  color: white;
+  margin-bottom: 2rem;
+`;
+
+const QRCode = styled.div`
+  font-size: 8rem;
+  margin-bottom: 1rem;
+
+  @media (max-width: 768px) {
+    font-size: 5rem;
+  }
+`;
+
+const QRText = styled.p`
+  font-size: 1.2rem;
+  margin: 0.5rem 0;
+`;
+
+const HighlightText = styled.p`
+  font-size: 1.3rem !important;
+  font-weight: bold;
+  margin-top: 1rem !important;
+`;
+
+const GiftBox = styled.div`
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  padding: 2rem;
+  border-radius: 15px;
+  color: white;
+
+  h3 {
+    font-size: 1.8rem;
+  }
+`;
+
+const BudgetList = styled.div`
+  max-width: 800px;
+  margin: 0 auto 2rem;
+`;
+
+const BudgetItem = styled.div`
+  display: flex;
+  align-items: center;
+  padding: 1.2rem;
+  margin-bottom: 1rem;
+  background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+  border-radius: 10px;
+  border-left: 4px solid #667eea;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+`;
+
+const BudgetPercent = styled.span`
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #667eea;
+  min-width: 80px;
+  margin-right: 1.5rem;
+
+  @media (max-width: 768px) {
+    margin-bottom: 0.5rem;
+  }
+`;
+
+const BudgetDesc = styled.span`
+  font-size: 1.05rem;
+  line-height: 1.6;
+  color: #2d3748;
+`;
+
+const BudgetNote = styled.p`
+  text-align: center;
+  font-size: 1.1rem;
+  color: #4a5568;
+  font-style: italic;
+`;
+
+const MessageContent = styled.div`
+  max-width: 800px;
+  margin: 0 auto;
+  font-size: 1.1rem;
+  line-height: 1.8;
+  color: #4a5568;
+
+  p {
+    margin-bottom: 1.5rem;
+  }
+
+  strong {
+    color: #2d3748;
+  }
+`;
+
+const PSBox = styled.p`
+  margin-top: 2rem;
+  padding: 1.5rem;
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  border-radius: 10px;
+  color: white;
+`;
+
+const Disclaimer = styled(Section)`
+  text-align: center;
+  font-size: 0.95rem;
+  color: #4a5568;
+  border: 2px solid #ffd700;
+`;
+
+const Footer = styled.footer`
+  background: rgba(255, 255, 255, 0.95);
+  padding: 2rem;
+  text-align: center;
+  color: #4a5568;
+  margin-top: auto;
+`;
+
+function App() {
+
+  return (
+    <AppContainer>
+      <Header>
+        <Logo>🌱 NUÔI TÔI 🌱</Logo>
+      </Header>
+
+      <MainContent>
+        <Hero>
+          <HeroTitle>🌱 NUÔI TÔI 🌱</HeroTitle>
+          <Tagline>
+            <strong>HÃY NUÔI TÔI.</strong>
+            <br />
+            Tôi hứa sao kê đầy đủ! 💯
+          </Tagline>
+        </Hero>
+
+        <Section>
+          <SectionTitle>🎯 Tại Sao Nên Nuôi Tôi?</SectionTitle>
+          <FeaturesGrid>
+            <FeatureCard>
+              <FeatureIcon>📊</FeatureIcon>
+              <FeatureTitle>Sao Kê Realtime</FeatureTitle>
+              <FeatureDescription>
+                Cập nhật từng giây! Còn nhanh hơn cả tốc độ bạn chuyển tiền!
+              </FeatureDescription>
+            </FeatureCard>
+            <FeatureCard>
+              <FeatureIcon>🔍</FeatureIcon>
+              <FeatureTitle>Minh Bạch 300%</FeatureTitle>
+              <FeatureDescription>
+                Hơn cả 100%! Tôi còn báo cáo cả việc mua ly trà sữa!
+              </FeatureDescription>
+            </FeatureCard>
+            <FeatureCard>
+              <FeatureIcon>💸</FeatureIcon>
+              <FeatureTitle>Chi Tiêu Hợp Lý</FeatureTitle>
+              <FeatureDescription>
+                Không mua xe hơi, nhà cửa. Chỉ ăn cơm với mì tôm thôi!
+              </FeatureDescription>
+            </FeatureCard>
+            <FeatureCard>
+              <FeatureIcon>📱</FeatureIcon>
+              <FeatureTitle>App Tracking</FeatureTitle>
+              <FeatureDescription>
+                Theo dõi 24/7 tôi ăn gì, uống gì, đi đâu. Như "Big Brother" vậy!
+              </FeatureDescription>
+            </FeatureCard>
+          </FeaturesGrid>
+        </Section>
+
+        <Section>
+          <SectionTitle>🎪 Cam Kết Vàng Của Tôi:</SectionTitle>
+          <CommitmentsList>
+            <CommitmentItem>
+              <strong>Sao kê mỗi ngày:</strong> Cập nhật lúc 6h sáng, đều như vắt chanh! (Kể cả Chủ Nhật & Lễ)
+            </CommitmentItem>
+            <CommitmentItem>
+              <strong>Không giấu giếm:</strong> Từ tô phở 50k đến hộp sữa chua 8k đều được ghi chép tỉ mỉ!
+            </CommitmentItem>
+            <CommitmentItem>
+              <strong>Có hóa đơn chứng từ:</strong> Chụp hình bill, quét mã vạch, lưu biên lai đầy đủ!
+            </CommitmentItem>
+            <CommitmentItem>
+              <strong>Video unboxing:</strong> Mở từng gói mì tôm live trên Facebook cho anh chị xem!
+            </CommitmentItem>
+            <CommitmentItem>
+              <strong>Hotline 24/7:</strong> Gọi hỏi tôi ăn gì bất cứ lúc nào, kể cả 3h sáng!
+            </CommitmentItem>
+            <CommitmentItem>
+              <strong>Không block:</strong> Hỏi khó đến mấy cũng trả lời, không "đã xem" rồi im lặng!
+            </CommitmentItem>
+          </CommitmentsList>
+        </Section>
+
+        <Section>
+          <SectionTitle>💰 So Sánh Với "Người Khác"</SectionTitle>
+          <ComparisonGrid>
+            <ComparisonCard variant="negative">
+              <h3>❌ Người Khác:</h3>
+              <ul>
+                <li>Sao kê sau 3 năm (hoặc không bao giờ)</li>
+                <li>File Excel blur mờ như ảnh ma</li>
+                <li>Số liệu "làm tròn" theo kiểu 1 + 1 = 3</li>
+                <li>Block người hỏi nhanh như chớp</li>
+              </ul>
+            </ComparisonCard>
+            <ComparisonCard variant="positive">
+              <h3>✅ Nuôi Tôi:</h3>
+              <ul>
+                <li>Sao kê trước khi tiêu (để anh chị duyệt)</li>
+                <li>File Excel 4K Ultra HD, có chữ ký điện tử</li>
+                <li>Số liệu chính xác đến từng đồng</li>
+                <li>Trả lời inbox nhanh hơn cả chatbot</li>
+              </ul>
+            </ComparisonCard>
+          </ComparisonGrid>
+        </Section>
+
+        <DonateSection>
+          <DonateTitle>💳 DONATE NGAY ĐI, NẾU BẠN ĐANG CƯỜI!</DonateTitle>
+          <QRPlaceholder>
+            <QRCode>📱</QRCode>
+            <QRText>Quét mã QR này để nuôi tôi (và nhận bản sao kê ngay lập tức!)</QRText>
+            <HighlightText>⚡ Chuyển xong là có mail tự động! ⚡</HighlightText>
+          </QRPlaceholder>
+          <GiftBox>
+            <h3>🎁 TÔI MUỐN NUÔI BẠN!</h3>
+          </GiftBox>
+        </DonateSection>
+
+        <Section>
+          <SectionTitle>📈 Tôi Sẽ Dùng Tiền Vào Đâu?</SectionTitle>
+          <BudgetList>
+            <BudgetItem>
+              <BudgetPercent>40%</BudgetPercent>
+              <BudgetDesc>Ăn uống (Cơm, mì tôm, trứng, rau. KHÔNG có tôm hùm!)</BudgetDesc>
+            </BudgetItem>
+            <BudgetItem>
+              <BudgetPercent>20%</BudgetPercent>
+              <BudgetDesc>Điện nước internet (Để sao kê cho anh chị)</BudgetDesc>
+            </BudgetItem>
+            <BudgetItem>
+              <BudgetPercent>15%</BudgetPercent>
+              <BudgetDesc>Thuê nhà (Phòng trọ 15m², không phải penthouse)</BudgetDesc>
+            </BudgetItem>
+            <BudgetItem>
+              <BudgetPercent>10%</BudgetPercent>
+              <BudgetDesc>Y tế (Thuốc cảm, vitamin C, khẩu trang)</BudgetDesc>
+            </BudgetItem>
+            <BudgetItem>
+              <BudgetPercent>10%</BudgetPercent>
+              <BudgetDesc>Học tập nâng cao (Sách, khóa học online để sao kê tốt hơn)</BudgetDesc>
+            </BudgetItem>
+            <BudgetItem>
+              <BudgetPercent>5%</BudgetPercent>
+              <BudgetDesc>Giải trí (Netflix? Không! Chỉ Youtube miễn phí thôi!)</BudgetDesc>
+            </BudgetItem>
+          </BudgetList>
+          <BudgetNote>📊 Biểu đồ chi tiết cập nhật hàng tuần trên website!</BudgetNote>
+        </Section>
+
+        <Section>
+          <SectionTitle>🎤 Lời Nhắn Từ Trái Tim</SectionTitle>
+          <MessageContent>
+            <p>
+              Trong thời đại mà <strong>"từ thiện"</strong> đã trở thành từ nhạy cảm, Tôi xin khẳng định: <strong>HÃY NUÔI TÔI!</strong>
+            </p>
+            <p>
+              Tôi nghèo, tôi cần tiền, nhưng tôi KHÔNG MẤT LƯƠNG TÂM! Mỗi đồng tiền các bạn gửi, tôi sẽ chi tiêu rõ ràng, minh bạch như bụng đói của tôi vậy! 😭
+            </p>
+            <PSBox>
+              <em>P/S: Tôi hứa sẽ không mua xe hơi bằng tiền donate. Vì... tôi chưa có bằng lái! 🚗❌</em>
+            </PSBox>
+          </MessageContent>
+        </Section>
+
+        <Disclaimer>
+          <p>
+            <strong>⚠️ DISCLAIMER:</strong> Đây là trang web mang tính chất <strong>HÀI HƯỚC</strong> Mọi nội dung đều mang tính giải trí, không nhằm mục đích xúc phạm hay chỉ trích bất kỳ cá nhân/tổ chức nào.
+          </p>
+        </Disclaimer>
+      </MainContent>
+
+      <Footer>
+        <p>Made with 😂 and React</p>
+      </Footer>
+    </AppContainer>
+  );
+}
+
+export default App;
