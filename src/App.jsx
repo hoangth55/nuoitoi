@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { getLikes, incrementLike, hasUserLiked, getDonates, incrementDonate } from './services/storageService';
+import { donateInfo, getVietQRUrl } from './config/donateInfo';
 
 // Styled Components
 const AppContainer = styled.div`
@@ -414,6 +415,104 @@ const DonateButton = styled.button`
   }
 `;
 
+const PaymentMethods = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin-top: 2rem;
+`;
+
+const PaymentCard = styled.div`
+  background: rgba(255, 255, 255, 0.95);
+  padding: 2rem;
+  border-radius: 15px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  transition: transform 0.2s ease;
+
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  }
+`;
+
+const PaymentIcon = styled.div`
+  font-size: 3rem;
+  margin-bottom: 1rem;
+`;
+
+const PaymentTitle = styled.h3`
+  font-size: 1.3rem;
+  margin-bottom: 1rem;
+  color: #2d3748;
+`;
+
+const PaymentInfo = styled.div`
+  font-size: 1.1rem;
+  color: #4a5568;
+  margin-bottom: 1rem;
+  word-break: break-all;
+`;
+
+const CopyButton = styled.button`
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: none;
+  padding: 0.5rem 1.5rem;
+  border-radius: 25px;
+  color: white;
+  font-size: 0.9rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+  margin-top: 0.5rem;
+
+  &:hover {
+    transform: scale(1.05);
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+`;
+
+const QRCodeImage = styled.img`
+  width: 200px;
+  height: 200px;
+  margin: 1rem auto;
+  display: block;
+  border-radius: 10px;
+  background: white;
+  padding: 1rem;
+`;
+
+const BankInfo = styled.div`
+  text-align: left;
+  margin-top: 1rem;
+  font-size: 1rem;
+  line-height: 1.8;
+`;
+
+const BankRow = styled.div`
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+
+  &:last-child {
+    border-bottom: none;
+  }
+`;
+
+const BankLabel = styled.strong`
+  color: #2d3748;
+  min-width: 120px;
+`;
+
+const BankValue = styled.span`
+  color: #4a5568;
+  text-align: right;
+`;
+
 function App() {
   const [likes, setLikes] = useState(0);
   const [donates, setDonates] = useState(0);
@@ -470,8 +569,6 @@ function App() {
       const result = await incrementDonate();
       if (result.success) {
         setDonates(result.count);
-        // Có thể mở link donate thực tế ở đây
-        // window.open('your-donate-link', '_blank');
       } else {
         alert(result.message || 'Có lỗi xảy ra');
       }
@@ -479,6 +576,21 @@ function App() {
       console.error('Error donating:', error);
       alert('Có lỗi xảy ra khi donate');
     }
+  };
+
+  const copyToClipboard = (text, label) => {
+    navigator.clipboard.writeText(text).then(() => {
+      alert(`Đã copy ${label} vào clipboard!`);
+    }).catch(() => {
+      // Fallback cho browser cũ
+      const textArea = document.createElement('textarea');
+      textArea.value = text;
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textArea);
+      alert(`Đã copy ${label} vào clipboard!`);
+    });
   };
 
   return (
@@ -602,16 +714,110 @@ function App() {
 
         <DonateSection>
           <DonateTitle>💳 DONATE NGAY ĐI, NẾU BẠN ĐANG CƯỜI!</DonateTitle>
-          <QRPlaceholder>
-            <QRCode>📱</QRCode>
-            <QRText>Quét mã QR này để nuôi tôi (và nhận bản sao kê ngay lập tức!)</QRText>
-            <HighlightText>⚡ Chuyển xong là có mail tự động! ⚡</HighlightText>
+          <QRText style={{ marginBottom: '2rem', color: '#4a5568' }}>
+            Chọn phương thức thanh toán phù hợp với bạn. Sau khi chuyển khoản, click nút "Đã Donate" để cập nhật số lượt!
+          </QRText>
+          
+          <PaymentMethods>
+            <PaymentCard>
+              <PaymentIcon>🏦</PaymentIcon>
+              <PaymentTitle>Chuyển Khoản Ngân Hàng</PaymentTitle>
+              <BankInfo>
+                <BankRow>
+                  <BankLabel>Ngân hàng:</BankLabel>
+                  <BankValue>{donateInfo.bank.name}</BankValue>
+                </BankRow>
+                <BankRow>
+                  <BankLabel>Số tài khoản:</BankLabel>
+                  <BankValue>{donateInfo.bank.accountNumber}</BankValue>
+                </BankRow>
+                <BankRow>
+                  <BankLabel>Chủ tài khoản:</BankLabel>
+                  <BankValue>{donateInfo.bank.accountName}</BankValue>
+                </BankRow>
+                <BankRow>
+                  <BankLabel>Nội dung:</BankLabel>
+                  <BankValue>{donateInfo.bank.transferNote}</BankValue>
+                </BankRow>
+              </BankInfo>
+              <CopyButton onClick={() => copyToClipboard(donateInfo.bank.accountNumber, 'Số tài khoản')}>
+                📋 Copy số TK
+              </CopyButton>
+            </PaymentCard>
+
+            <PaymentCard>
+              <PaymentIcon>📱</PaymentIcon>
+              <PaymentTitle>VietQR</PaymentTitle>
+              <QRText style={{ fontSize: '0.9rem', marginBottom: '1rem' }}>
+                Quét mã QR bằng app ngân hàng
+              </QRText>
+              {/* QR Code sẽ được tạo từ link VietQR hoặc image */}
+              {donateInfo.vietQR.enabled ? (
+                <QRCodeImage 
+                  src={getVietQRUrl(0)} 
+                  alt="VietQR Code"
+                  onError={(e) => {
+                    e.target.style.display = 'none';
+                    e.target.nextSibling.style.display = 'block';
+                  }}
+                />
+              ) : null}
+              <div style={{ display: donateInfo.vietQR.enabled ? 'none' : 'block', fontSize: '4rem', margin: '1rem 0' }}>📱</div>
+              <PaymentInfo style={{ fontSize: '0.9rem', marginTop: '1rem' }}>
+                Hoặc chuyển: <strong>{donateInfo.bank.accountNumber}</strong>
+              </PaymentInfo>
+              <CopyButton onClick={() => copyToClipboard(donateInfo.bank.accountNumber, 'Số tài khoản')}>
+                📋 Copy số TK
+              </CopyButton>
+            </PaymentCard>
+
+            {donateInfo.eWallet.momo.phone && (
+              <PaymentCard>
+                <PaymentIcon>💜</PaymentIcon>
+                <PaymentTitle>Ví MoMo</PaymentTitle>
+                <PaymentInfo>
+                  Số điện thoại: <strong>{donateInfo.eWallet.momo.phone}</strong>
+                </PaymentInfo>
+                <CopyButton onClick={() => copyToClipboard(donateInfo.eWallet.momo.phone, 'Số MoMo')}>
+                  📋 Copy số MoMo
+                </CopyButton>
+                <QRText style={{ fontSize: '0.85rem', marginTop: '1rem', color: '#666' }}>
+                  Quét QR trên app MoMo hoặc chuyển trực tiếp
+                </QRText>
+              </PaymentCard>
+            )}
+
+            {donateInfo.eWallet.zalopay.phone && (
+              <PaymentCard>
+                <PaymentIcon>💙</PaymentIcon>
+                <PaymentTitle>ZaloPay</PaymentTitle>
+                <PaymentInfo>
+                  Số điện thoại: <strong>{donateInfo.eWallet.zalopay.phone}</strong>
+                </PaymentInfo>
+                <CopyButton onClick={() => copyToClipboard(donateInfo.eWallet.zalopay.phone, 'Số ZaloPay')}>
+                  📋 Copy số ZaloPay
+                </CopyButton>
+                <QRText style={{ fontSize: '0.85rem', marginTop: '1rem', color: '#666' }}>
+                  Chuyển qua app ZaloPay
+                </QRText>
+              </PaymentCard>
+            )}
+          </PaymentMethods>
+
+          <QRPlaceholder style={{ marginTop: '2rem' }}>
+            <QRText>💡 Sau khi chuyển khoản thành công, click nút bên dưới để cập nhật số lượt donate!</QRText>
+            <HighlightText>⚡ Tôi sẽ sao kê đầy đủ mọi khoản nhận được! ⚡</HighlightText>
           </QRPlaceholder>
+          
           <DonateButton onClick={handleDonate}>
-            💰 Đã Donate! ({donates} lượt)
+            ✅ Đã Donate! ({donates} lượt)
           </DonateButton>
-          <GiftBox>
-            <h3>🎁 TÔI MUỐN NUÔI BẠN!</h3>
+          
+          <GiftBox style={{ marginTop: '2rem' }}>
+            <h3>🎁 CẢM ƠN BẠN ĐÃ NUÔI TÔI!</h3>
+            <p style={{ marginTop: '1rem', fontSize: '1rem' }}>
+              Mỗi đồng tiền bạn gửi sẽ được sao kê minh bạch và chi tiết nhất! 💯
+            </p>
           </GiftBox>
         </DonateSection>
 
