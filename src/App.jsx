@@ -612,20 +612,6 @@ function App() {
           </LikeButton>
         </Hero>
 
-        <StatsSection>
-          <SectionTitle>📊 Thống Kê</SectionTitle>
-          <StatsGrid>
-            <StatCard>
-              <StatNumber>{likes}</StatNumber>
-              <StatLabel>❤️ Lượt Like</StatLabel>
-            </StatCard>
-            <StatCard>
-              <StatNumber>{donates}</StatNumber>
-              <StatLabel>💳 Lượt Donate</StatLabel>
-            </StatCard>
-          </StatsGrid>
-        </StatsSection>
-
         <Section>
           <SectionTitle>🎯 Tại Sao Nên Nuôi Tôi?</SectionTitle>
           <FeaturesGrid>
@@ -869,6 +855,20 @@ function App() {
             </PSBox>
           </MessageContent>
         </Section>
+
+        <StatsSection>
+          <SectionTitle>📊 Thống Kê</SectionTitle>
+          <StatsGrid>
+            <StatCard>
+              <StatNumber>{likes}</StatNumber>
+              <StatLabel>❤️ Lượt Like</StatLabel>
+            </StatCard>
+            <StatCard>
+              <StatNumber>{donates}</StatNumber>
+              <StatLabel>💳 Lượt Donate</StatLabel>
+            </StatCard>
+          </StatsGrid>
+        </StatsSection>
 
         <Disclaimer>
           <p>
