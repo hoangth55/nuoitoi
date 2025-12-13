@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
+import { getLikes, incrementLike, hasUserLiked, getDonates, incrementDonate } from './services/storageService';
 
 // Styled Components
 const AppContainer = styled.div`
@@ -321,7 +322,164 @@ const Footer = styled.footer`
   margin-top: auto;
 `;
 
+const StatsSection = styled(Section)`
+  text-align: center;
+`;
+
+const StatsGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 2rem;
+  margin-top: 2rem;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+`;
+
+const StatCard = styled.div`
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 2rem;
+  border-radius: 15px;
+  color: white;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+`;
+
+const StatNumber = styled.div`
+  font-size: 3rem;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+`;
+
+const StatLabel = styled.div`
+  font-size: 1.2rem;
+  opacity: 0.9;
+`;
+
+const LikeButton = styled.button`
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  border: none;
+  padding: 1rem 2rem;
+  border-radius: 50px;
+  color: white;
+  font-size: 1.2rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  margin-top: 1rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+  }
+`;
+
+const DonateButton = styled.button`
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  border: none;
+  padding: 1rem 2rem;
+  border-radius: 50px;
+  color: white;
+  font-size: 1.2rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  margin-top: 1rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+`;
+
 function App() {
+  const [likes, setLikes] = useState(0);
+  const [donates, setDonates] = useState(0);
+  const [userLiked, setUserLiked] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // Load data khi component mount
+    const loadData = async () => {
+      try {
+        setLoading(true);
+        const [likesCount, donatesCount, hasLiked] = await Promise.all([
+          getLikes(),
+          getDonates(),
+          hasUserLiked()
+        ]);
+        setLikes(likesCount);
+        setDonates(donatesCount);
+        setUserLiked(hasLiked);
+      } catch (error) {
+        console.error('Error loading data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    loadData();
+  }, []);
+
+  const handleLike = async () => {
+    if (userLiked) return;
+    
+    try {
+      console.log('🔄 Starting like...');
+      const result = await incrementLike();
+      console.log('📥 Like result:', result);
+      
+      if (result.success) {
+        setLikes(result.count);
+        setUserLiked(true);
+        console.log('✅ Like successful, count:', result.count);
+      } else {
+        console.error('❌ Like failed:', result.message);
+        alert(result.message || 'Có lỗi xảy ra. Vui lòng mở Console (F12) để xem chi tiết.');
+      }
+    } catch (error) {
+      console.error('❌ Error liking:', error);
+      alert('Có lỗi xảy ra khi like: ' + error.message + '\nVui lòng mở Console (F12) để xem chi tiết.');
+    }
+  };
+
+  const handleDonate = async () => {
+    try {
+      const result = await incrementDonate();
+      if (result.success) {
+        setDonates(result.count);
+        // Có thể mở link donate thực tế ở đây
+        // window.open('your-donate-link', '_blank');
+      } else {
+        alert(result.message || 'Có lỗi xảy ra');
+      }
+    } catch (error) {
+      console.error('Error donating:', error);
+      alert('Có lỗi xảy ra khi donate');
+    }
+  };
 
   return (
     <AppContainer>
@@ -337,7 +495,24 @@ function App() {
             <br />
             Tôi hứa sao kê đầy đủ! 💯
           </Tagline>
+          <LikeButton onClick={handleLike} disabled={userLiked}>
+            {userLiked ? '❤️ Đã Like' : '🤍 Like'} {likes > 0 && `(${likes})`}
+          </LikeButton>
         </Hero>
+
+        <StatsSection>
+          <SectionTitle>📊 Thống Kê</SectionTitle>
+          <StatsGrid>
+            <StatCard>
+              <StatNumber>{likes}</StatNumber>
+              <StatLabel>❤️ Lượt Like</StatLabel>
+            </StatCard>
+            <StatCard>
+              <StatNumber>{donates}</StatNumber>
+              <StatLabel>💳 Lượt Donate</StatLabel>
+            </StatCard>
+          </StatsGrid>
+        </StatsSection>
 
         <Section>
           <SectionTitle>🎯 Tại Sao Nên Nuôi Tôi?</SectionTitle>
@@ -353,7 +528,7 @@ function App() {
               <FeatureIcon>🔍</FeatureIcon>
               <FeatureTitle>Minh Bạch 300%</FeatureTitle>
               <FeatureDescription>
-                Hơn cả 100%! Tôi còn báo cáo cả việc mua ly trà sữa!
+                Hơn cả 100%! Từ ly trà sữa đến cốc bia, ly cafe đều sao kê đầy đủ!
               </FeatureDescription>
             </FeatureCard>
             <FeatureCard>
@@ -380,7 +555,10 @@ function App() {
               <strong>Sao kê mỗi ngày:</strong> Cập nhật lúc 6h sáng, đều như vắt chanh! (Kể cả Chủ Nhật & Lễ)
             </CommitmentItem>
             <CommitmentItem>
-              <strong>Không giấu giếm:</strong> Từ tô phở 50k đến hộp sữa chua 8k đều được ghi chép tỉ mỉ!
+              <strong>Không giấu giếm:</strong> Từ tô phở 50k đến hộp sữa chua 8k, từ cốc bia 30k đến ly cafe 25k đều được ghi chép tỉ mỉ!
+            </CommitmentItem>
+            <CommitmentItem>
+              <strong>Beer & Cafe đều sao kê:</strong> Đi uống bia với bạn, cafe làm việc, tất cả đều có hóa đơn, chụp ảnh check-in, và báo cáo đầy đủ! Không có gì bị "quên"!
             </CommitmentItem>
             <CommitmentItem>
               <strong>Có hóa đơn chứng từ:</strong> Chụp hình bill, quét mã vạch, lưu biên lai đầy đủ!
@@ -415,6 +593,7 @@ function App() {
                 <li>Sao kê trước khi tiêu (để anh chị duyệt)</li>
                 <li>File Excel 4K Ultra HD, có chữ ký điện tử</li>
                 <li>Số liệu chính xác đến từng đồng</li>
+                <li>Beer, cafe đều sao kê đầy đủ, không giấu giếm!</li>
                 <li>Trả lời inbox nhanh hơn cả chatbot</li>
               </ul>
             </ComparisonCard>
@@ -428,6 +607,9 @@ function App() {
             <QRText>Quét mã QR này để nuôi tôi (và nhận bản sao kê ngay lập tức!)</QRText>
             <HighlightText>⚡ Chuyển xong là có mail tự động! ⚡</HighlightText>
           </QRPlaceholder>
+          <DonateButton onClick={handleDonate}>
+            💰 Đã Donate! ({donates} lượt)
+          </DonateButton>
           <GiftBox>
             <h3>🎁 TÔI MUỐN NUÔI BẠN!</h3>
           </GiftBox>
@@ -438,7 +620,7 @@ function App() {
           <BudgetList>
             <BudgetItem>
               <BudgetPercent>40%</BudgetPercent>
-              <BudgetDesc>Ăn uống (Cơm, mì tôm, trứng, rau. KHÔNG có tôm hùm!)</BudgetDesc>
+              <BudgetDesc>Ăn uống (Cơm, mì tôm, trứng, rau, beer, cafe. Tất cả đều sao kê đầy đủ! KHÔNG có tôm hùm!)</BudgetDesc>
             </BudgetItem>
             <BudgetItem>
               <BudgetPercent>20%</BudgetPercent>
@@ -472,6 +654,9 @@ function App() {
             </p>
             <p>
               Tôi nghèo, tôi cần tiền, nhưng tôi KHÔNG MẤT LƯƠNG TÂM! Mỗi đồng tiền các bạn gửi, tôi sẽ chi tiêu rõ ràng, minh bạch như bụng đói của tôi vậy! 😭
+            </p>
+            <p>
+              Đi uống beer với bạn? <strong>Sao kê!</strong> Cafe làm việc? <strong>Sao kê!</strong> Mua đồ ăn vặt? <strong>Sao kê!</strong> Không có gì bị che giấu, tất cả đều minh bạch 100%! 🍺☕
             </p>
             <PSBox>
               <em>P/S: Tôi hứa sẽ không mua xe hơi bằng tiền donate. Vì... tôi chưa có bằng lái! 🚗❌</em>
