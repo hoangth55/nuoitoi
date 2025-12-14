@@ -513,6 +513,67 @@ const BankValue = styled.span`
   text-align: right;
 `;
 
+const CharityWarning = styled(Section)`
+  background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+  color: white;
+  border: 3px solid #ffd700;
+  box-shadow: 0 10px 30px rgba(255, 0, 0, 0.3);
+`;
+
+const CharityTitle = styled.h2`
+  font-size: 2rem;
+  margin-bottom: 1.5rem;
+  color: white;
+  text-align: center;
+`;
+
+const CharityText = styled.p`
+  font-size: 1.2rem;
+  line-height: 1.8;
+  margin-bottom: 1.5rem;
+  text-align: center;
+  
+  strong {
+    font-size: 1.3rem;
+    color: #ffd700;
+  }
+`;
+
+const CharityAccounts = styled.div`
+  background: rgba(255, 255, 255, 0.95);
+  padding: 2rem;
+  border-radius: 15px;
+  margin-top: 2rem;
+  color: #2d3748;
+`;
+
+const CharityAccountItem = styled.div`
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+  border-radius: 10px;
+  border-left: 4px solid #667eea;
+  
+  &:last-child {
+    margin-bottom: 0;
+  }
+`;
+
+const CharityBankName = styled.h3`
+  font-size: 1.3rem;
+  margin-bottom: 1rem;
+  color: #2d3748;
+`;
+
+const CharityAccountInfo = styled.div`
+  font-size: 1rem;
+  line-height: 1.8;
+  
+  strong {
+    color: #667eea;
+  }
+`;
+
 function App() {
   const [likes, setLikes] = useState(0);
   const [donates, setDonates] = useState(0);
@@ -731,63 +792,6 @@ function App() {
               </CopyButton>
             </PaymentCard>
 
-            <PaymentCard>
-              <PaymentIcon>📱</PaymentIcon>
-              <PaymentTitle>VietQR</PaymentTitle>
-              <QRText style={{ fontSize: '0.9rem', marginBottom: '1rem' }}>
-                Quét mã QR bằng app ngân hàng
-              </QRText>
-              {/* QR Code sẽ được tạo từ link VietQR hoặc image */}
-              {donateInfo.vietQR.enabled ? (
-                <QRCodeImage 
-                  src={getVietQRUrl(0)} 
-                  alt="VietQR Code"
-                  onError={(e) => {
-                    e.target.style.display = 'none';
-                    e.target.nextSibling.style.display = 'block';
-                  }}
-                />
-              ) : null}
-              <div style={{ display: donateInfo.vietQR.enabled ? 'none' : 'block', fontSize: '4rem', margin: '1rem 0' }}>📱</div>
-              <PaymentInfo style={{ fontSize: '0.9rem', marginTop: '1rem' }}>
-                Hoặc chuyển: <strong>{donateInfo.bank.accountNumber}</strong>
-              </PaymentInfo>
-              <CopyButton onClick={() => copyToClipboard(donateInfo.bank.accountNumber, 'Số tài khoản')}>
-                📋 Copy số TK
-              </CopyButton>
-            </PaymentCard>
-
-            {donateInfo.eWallet.momo.phone && (
-              <PaymentCard>
-                <PaymentIcon>💜</PaymentIcon>
-                <PaymentTitle>Ví MoMo</PaymentTitle>
-                <PaymentInfo>
-                  Số điện thoại: <strong>{donateInfo.eWallet.momo.phone}</strong>
-                </PaymentInfo>
-                <CopyButton onClick={() => copyToClipboard(donateInfo.eWallet.momo.phone, 'Số MoMo')}>
-                  📋 Copy số MoMo
-                </CopyButton>
-                <QRText style={{ fontSize: '0.85rem', marginTop: '1rem', color: '#666' }}>
-                  Quét QR trên app MoMo hoặc chuyển trực tiếp
-                </QRText>
-              </PaymentCard>
-            )}
-
-            {donateInfo.eWallet.zalopay.phone && (
-              <PaymentCard>
-                <PaymentIcon>💙</PaymentIcon>
-                <PaymentTitle>ZaloPay</PaymentTitle>
-                <PaymentInfo>
-                  Số điện thoại: <strong>{donateInfo.eWallet.zalopay.phone}</strong>
-                </PaymentInfo>
-                <CopyButton onClick={() => copyToClipboard(donateInfo.eWallet.zalopay.phone, 'Số ZaloPay')}>
-                  📋 Copy số ZaloPay
-                </CopyButton>
-                <QRText style={{ fontSize: '0.85rem', marginTop: '1rem', color: '#666' }}>
-                  Chuyển qua app ZaloPay
-                </QRText>
-              </PaymentCard>
-            )}
           </PaymentMethods>
 
           <QRPlaceholder style={{ marginTop: '2rem' }}>
@@ -869,17 +873,85 @@ function App() {
             </StatCard>
           </StatsGrid>
         </StatsSection>
+        <CharityWarning>
+          <CharityTitle>⚠️ LƯU Ý QUAN TRỌNG ⚠️</CharityTitle>
+          <CharityText>
+            <strong>Nội dung trên là đùa vui thôi!</strong>
+            <br />
+            Còn việc từ thiện đừng tin mấy thầy online, hãy gửi trực tiếp tới <strong>Mặt trận Tổ quốc</strong>!
+          </CharityText>
+          
+          <CharityAccounts>
+            <h3 style={{ textAlign: 'center', marginBottom: '1.5rem', fontSize: '1.5rem', color: '#2d3748' }}>
+              🏦 Tài khoản ủng hộ chính thức - Ban Vận động cứu trợ Trung ương
+            </h3>
+            
+            <CharityAccountItem>
+              <CharityBankName>1. Ngân hàng TMCP Công Thương Việt Nam (VietinBank)</CharityBankName>
+              <CharityAccountInfo>
+                <div><strong>Tên tài khoản:</strong> Ban Vận động cứu trợ Trung ương</div>
+                <div><strong>Số tài khoản:</strong> 55102025</div>
+                <div><strong>Chi nhánh:</strong> Ngân hàng TMCP Công thương Việt Nam - Chi nhánh Đông Hà Nội</div>
+              </CharityAccountInfo>
+              <CopyButton onClick={() => copyToClipboard('55102025', 'Số tài khoản VietinBank')} style={{ marginTop: '1rem' }}>
+                📋 Copy số TK
+              </CopyButton>
+            </CharityAccountItem>
 
+            <CharityAccountItem>
+              <CharityBankName>2. Ngân hàng TMCP Đầu tư và Phát triển Việt Nam (BIDV)</CharityBankName>
+              <CharityAccountInfo>
+                <div><strong>Tên tài khoản:</strong> Ủy ban Trung Ương MTTQ Việt Nam – Ban Vận động cứu trợ Trung ương</div>
+                <div><strong>Số tài khoản:</strong> 8639699999</div>
+                <div><strong>Chi nhánh:</strong> Ngân hàng TMCP Đầu tư và Phát triển Việt Nam – Chi nhánh Thăng Long</div>
+              </CharityAccountInfo>
+              <CopyButton onClick={() => copyToClipboard('8639699999', 'Số tài khoản BIDV')} style={{ marginTop: '1rem' }}>
+                📋 Copy số TK
+              </CopyButton>
+            </CharityAccountItem>
+
+            <CharityAccountItem>
+              <CharityBankName>3. Ngân hàng Nông nghiệp và Phát triển Nông thôn Việt Nam (Agribank)</CharityBankName>
+              <CharityAccountInfo>
+                <div><strong>Tên tài khoản:</strong> Ban vận động cứu trợ Trung Ương</div>
+                <div><strong>Số tài khoản:</strong> 1400666102025</div>
+                <div><strong>Chi nhánh:</strong> Ngân hàng Nông nghiệp và Phát triển Nông thôn - Chi nhánh Láng Hạ</div>
+              </CharityAccountInfo>
+              <CopyButton onClick={() => copyToClipboard('1400666102025', 'Số tài khoản Agribank')} style={{ marginTop: '1rem' }}>
+                📋 Copy số TK
+              </CopyButton>
+            </CharityAccountItem>
+
+            <CharityAccountItem>
+              <CharityBankName>4. Ngân hàng TMCP Ngoại thương Việt Nam (Vietcombank)</CharityBankName>
+              <CharityAccountInfo>
+                <div><strong>Tên tài khoản:</strong> Mặt trận Tổ quốc Việt Nam-Ban cứu trợ Trung ương</div>
+                <div><strong>Số tài khoản:</strong> 8888881010</div>
+                <div><strong>Chi nhánh:</strong> Ngân hàng TMCP Ngoại thương Việt Nam – Chi nhánh Sở giao dịch</div>
+              </CharityAccountInfo>
+              <CopyButton onClick={() => copyToClipboard('8888881010', 'Số tài khoản Vietcombank')} style={{ marginTop: '1rem' }}>
+                📋 Copy số TK
+              </CopyButton>
+            </CharityAccountItem>
+
+            <CharityAccountItem>
+              <CharityBankName>5. Ngân hàng TMCP Quân đội (MBBank)</CharityBankName>
+              <CharityAccountInfo>
+                <div><strong>Tên tài khoản:</strong> Mặt trận Tổ quốc Việt Nam-Ban cứu trợ Trung ương</div>
+                <div><strong>Số tài khoản:</strong> 0606</div>
+              </CharityAccountInfo>
+              <CopyButton onClick={() => copyToClipboard('0606', 'Số tài khoản MBBank')} style={{ marginTop: '1rem' }}>
+                📋 Copy số TK
+              </CopyButton>
+            </CharityAccountItem>
+          </CharityAccounts>
+        </CharityWarning>
         <Disclaimer>
           <p>
-            <strong>⚠️ DISCLAIMER:</strong> Đây là trang web mang tính chất <strong>HÀI HƯỚC</strong> Mọi nội dung đều mang tính giải trí, không nhằm mục đích xúc phạm hay chỉ trích bất kỳ cá nhân/tổ chức nào.
+            <strong>⚠️ DISCLAIMER:</strong> Đây là trang web mang tính chất <strong>HÀI HƯỚC</strong> Mọi nội dung đều mang tính giải trí, không nhằm mục đích xúc phạm hay chỉ trích bất kỳ cá nhân/tổ chức nào. Còn việc từ thiện đừng tin mấy thầy online, hãy gửi trực tiếp tới Mặt trận Tổ quốc!
           </p>
         </Disclaimer>
       </MainContent>
-
-      <Footer>
-        <p>Made with 😂 and React</p>
-      </Footer>
     </AppContainer>
   );
 }
