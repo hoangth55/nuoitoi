@@ -574,6 +574,46 @@ const CharityAccountInfo = styled.div`
   }
 `;
 
+const HospitalInfo = styled.div`
+  background: rgba(255, 255, 255, 0.95);
+  padding: 2rem;
+  border-radius: 15px;
+  margin-top: 2rem;
+  color: #2d3748;
+`;
+
+const HospitalItem = styled.div`
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  background: linear-gradient(135deg, #ffd89b 0%, #19547b 100%);
+  border-radius: 10px;
+  border-left: 4px solid #ff6b6b;
+  color: white;
+  
+  &:last-child {
+    margin-bottom: 0;
+  }
+`;
+
+const HospitalName = styled.h3`
+  font-size: 1.3rem;
+  margin-bottom: 1rem;
+  color: white;
+`;
+
+const HospitalDetails = styled.div`
+  font-size: 1rem;
+  line-height: 1.8;
+  
+  div {
+    margin-bottom: 0.5rem;
+  }
+  
+  strong {
+    color: #ffd700;
+  }
+`;
+
 function App() {
   const [likes, setLikes] = useState(0);
   const [donates, setDonates] = useState(0);
@@ -945,6 +985,42 @@ function App() {
               </CopyButton>
             </CharityAccountItem>
           </CharityAccounts>
+
+          <HospitalInfo>
+            <h3 style={{ textAlign: 'center', marginBottom: '1.5rem', fontSize: '1.5rem', color: '#2d3748' }}>
+              🏥 Liên hệ trực tiếp các bệnh viện để ủng hộ các em bệnh nhỏ có hoàn cảnh khó khăn
+            </h3>
+            
+            <HospitalItem>
+              <HospitalName>1. Phòng Công tác xã hội - Bệnh viện Nhi Trung ương</HospitalName>
+              <HospitalDetails>
+                <div><strong>Địa chỉ:</strong> Số 18, Ngõ 879 đường La Thành, phường Láng, Hà Nội</div>
+                <div><strong>Điện thoại:</strong> (024) 6273 8774</div>
+                <div><strong>Email:</strong> p.ctxh@nch.org.vn</div>
+                <div><strong>Website:</strong> benhviennhitrunguong.gov.vn</div>
+                <div style={{ marginTop: '1rem', fontStyle: 'italic' }}>
+                  Nơi có rất nhiều em bệnh nhỏ có hoàn cảnh khó khăn cần giúp đỡ. Bạn có thể liên hệ trực tiếp để ủng hộ các em.
+                </div>
+              </HospitalDetails>
+            </HospitalItem>
+
+            <HospitalItem>
+              <HospitalName>2. Phòng Công tác xã hội - Viện Huyết học - Truyền máu Trung ương</HospitalName>
+              <HospitalDetails>
+                <div><strong>Đơn vị:</strong> Phòng Công tác xã hội (trực thuộc Viện Huyết học - Truyền máu Trung ương)</div>
+                <div><strong>Địa chỉ:</strong> Phòng 907, tầng 9, Tòa nhà H, Viện Huyết học - Truyền máu Trung ương, phố Phạm Văn Bạch, Yên Hòa, Cầu Giấy, Hà Nội</div>
+                <div><strong>Điện thoại:</strong> (024) 3833 0088</div>
+                <div><strong>Email:</strong> ctxhvhh@gmail.com</div>
+                <div style={{ marginTop: '1rem', fontStyle: 'italic' }}>
+                  Nơi điều trị và chăm sóc nhiều bệnh nhân nhỏ tuổi mắc các bệnh về máu, có hoàn cảnh khó khăn cần sự hỗ trợ từ cộng đồng. Bạn có thể liên hệ trực tiếp để được hướng dẫn cách ủng hộ.
+                </div>
+              </HospitalDetails>
+            </HospitalItem>
+
+            <div style={{ marginTop: '1.5rem', padding: '1rem', background: 'rgba(102, 126, 234, 0.1)', borderRadius: '10px', textAlign: 'center' }}>
+              <strong style={{ color: '#667eea' }}>💡 Bạn có thể liên hệ trực tiếp các bệnh viện trên để được hướng dẫn cách ủng hộ cụ thể</strong>
+            </div>
+          </HospitalInfo>
         </CharityWarning>
         <Disclaimer>
           <p>
